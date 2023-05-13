@@ -6,69 +6,73 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1117</width>
-    <height>588</height>
+    <width>811</width>
+    <height>521</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="gridLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>641</width>
-      <height>441</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="2">
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="text">
-        <string>Удалить</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0" colspan="3">
-      <widget class="QTableWidget" name="tableWidget"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>Редактировать</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Добавить</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QComboBox" name="cmbDeposit"/>
-     </item>
-     <item row="1" column="2">
-      <widget class="QComboBox" name="cmbType"/>
-     </item>
-    </layout>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="2">
+       <widget class="QComboBox" name="cmbType"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="btnAdd">
+        <property name="text">
+         <string>Добавить</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="btnRemove">
+        <property name="text">
+         <string>Удалить</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="cmbDeposit"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="btnEdit">
+        <property name="text">
+         <string>Редактировать</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="3">
+       <widget class="QTableView" name="tblItems"/>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1">
+     <widget class="QtCharts" name="graphicsView"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1117</width>
+     <width>811</width>
      <height>26</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtCharts</class>
+   <extends>QGraphicsView</extends>
+   <header>PySide2.QtCharts</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

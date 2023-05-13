@@ -12,54 +12,62 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
+from PySide2.QtCharts import QtCharts
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1117, 588)
+        MainWindow.resize(811, 521)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.gridLayoutWidget = QWidget(self.centralwidget)
-        self.gridLayoutWidget.setObjectName(u"gridLayoutWidget")
-        self.gridLayoutWidget.setGeometry(QRect(20, 20, 641, 441))
-        self.gridLayout = QGridLayout(self.gridLayoutWidget)
+        self.gridLayout_2 = QGridLayout(self.centralwidget)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.pushButton_3 = QPushButton(self.gridLayoutWidget)
-        self.pushButton_3.setObjectName(u"pushButton_3")
-
-        self.gridLayout.addWidget(self.pushButton_3, 0, 2, 1, 1)
-
-        self.tableWidget = QTableWidget(self.gridLayoutWidget)
-        self.tableWidget.setObjectName(u"tableWidget")
-
-        self.gridLayout.addWidget(self.tableWidget, 2, 0, 1, 3)
-
-        self.pushButton_2 = QPushButton(self.gridLayoutWidget)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-
-        self.gridLayout.addWidget(self.pushButton_2, 0, 1, 1, 1)
-
-        self.pushButton = QPushButton(self.gridLayoutWidget)
-        self.pushButton.setObjectName(u"pushButton")
-
-        self.gridLayout.addWidget(self.pushButton, 0, 0, 1, 1)
-
-        self.cmbDeposit = QComboBox(self.gridLayoutWidget)
-        self.cmbDeposit.setObjectName(u"cmbDeposit")
-
-        self.gridLayout.addWidget(self.cmbDeposit, 1, 0, 1, 1)
-
-        self.cmbType = QComboBox(self.gridLayoutWidget)
+        self.cmbType = QComboBox(self.centralwidget)
         self.cmbType.setObjectName(u"cmbType")
 
         self.gridLayout.addWidget(self.cmbType, 1, 2, 1, 1)
 
+        self.btnAdd = QPushButton(self.centralwidget)
+        self.btnAdd.setObjectName(u"btnAdd")
+
+        self.gridLayout.addWidget(self.btnAdd, 0, 0, 1, 1)
+
+        self.btnRemove = QPushButton(self.centralwidget)
+        self.btnRemove.setObjectName(u"btnRemove")
+
+        self.gridLayout.addWidget(self.btnRemove, 0, 2, 1, 1)
+
+        self.cmbDeposit = QComboBox(self.centralwidget)
+        self.cmbDeposit.setObjectName(u"cmbDeposit")
+
+        self.gridLayout.addWidget(self.cmbDeposit, 1, 0, 1, 1)
+
+        self.btnEdit = QPushButton(self.centralwidget)
+        self.btnEdit.setObjectName(u"btnEdit")
+
+        self.gridLayout.addWidget(self.btnEdit, 0, 1, 1, 1)
+
+        self.tblItems = QTableView(self.centralwidget)
+        self.tblItems.setObjectName(u"tblItems")
+
+        self.gridLayout.addWidget(self.tblItems, 2, 0, 1, 3)
+
+
+        self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
+
+        self.graphicsView = QtCharts.QChartView(self.centralwidget)
+        self.graphicsView.setObjectName(u"graphicsView")
+
+        self.gridLayout_2.addWidget(self.graphicsView, 0, 1, 1, 1)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1117, 26))
+        self.menubar.setGeometry(QRect(0, 0, 811, 26))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -72,8 +80,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c", None))
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"\u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c", None))
+        self.btnAdd.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c", None))
+        self.btnRemove.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c", None))
+        self.btnEdit.setText(QCoreApplication.translate("MainWindow", u"\u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c", None))
     # retranslateUi
 
