@@ -1,3 +1,5 @@
+import collections
+from statistics import mean
 import sys
 from PySide2.QtWidgets import QApplication, QMainWindow,QDialog
 from PySide2 import QtCore, QtWidgets
@@ -34,7 +36,7 @@ class ItemsModel(QtCore.QAbstractTableModel):
         return len(self.items)
     
     def columnCount(self, *args, **kwargs) -> int:
-        return 6
+        return 5
     
     def data(self, index: QtCore.QModelIndex, role: QtCore.Qt.ItemDataRole):
         if not index.isValid():
@@ -46,14 +48,12 @@ class ItemsModel(QtCore.QAbstractTableModel):
             if col == 0:
                 return self.deposits[emergency_occurrence_info.mestorozdenie_id].name
             elif col == 1:
-                return f'{emergency_occurrence_info.since}'
+                return f'{emergency_occurrence_info.year}'
             elif col == 2:
-                return f'{emergency_occurrence_info.until}'
-            elif col == 3:
                 return f'{emergency_occurrence_info.injured_amount}'
-            elif col == 4:
+            elif col == 3:
                 return self.emergencyTypes[emergency_occurrence_info.emergency_type_id].name
-            elif col == 5:
+            elif col == 4:
                 return f'{emergency_occurrence_info.comment}'
         elif role == QtCore.Qt.ItemDataRole.UserRole:
             return self.items[index.row()]
@@ -63,11 +63,10 @@ class ItemsModel(QtCore.QAbstractTableModel):
             if orientation == QtCore.Qt.Orientation.Horizontal:
                 return {
                     0: "Месторождение",
-                    1: "Начало происшествия",
-                    2: "Окончание происшествия",
-                    3: "Сумма ущерба",
-                    4: "Тип происшествия",
-                    5: "Комментарий",
+                    1: "Год происшествия",
+                    2: "Сумма ущерба",
+                    3: "Тип происшествия",
+                    4: "Комментарий",
                 }.get(section)
 
 class EditDialog(QDialog):
@@ -91,8 +90,7 @@ class EditDialog(QDialog):
         return {
             "deposit_id": self.ui.cmbDeposit.currentData().id,
             "type_id": self.ui.cmbType.currentData().id,
-            "since": self.ui.timeSince.text(),
-            "until": self.ui.timeUntil.text(),
+            "year": self.ui.txtYear.text(),
             "injured": self.ui.txtInjured.text(),
             "comment": self.ui.txtComment.text(),        
         }
@@ -120,15 +118,72 @@ class MainWindow(QMainWindow):
         self.ui.cmbDeposit.currentIndexChanged.connect(self.load_emergency_occurrence)
         self.ui.cmbType.currentIndexChanged.connect(self.load_emergency_occurrence)
         self.ui.btnAdd.clicked.connect(self.on_btnAdd_click)
+        self.ui.btnRemove.clicked.connect(self.on_btnRemove_click)
     
+    def draw_bar_chart(self):
+        self.data_by_deposits = {}
+        
+        years = set()
+        for row in self.rows:
+            items = self.data_by_deposits.setdefault(row.mestorozdenie_id, {})
+            items[row.year] = items.get(row.year, 0) + 1
+            years.add(row.year)
+
+        years = sorted(years)
+        print('YEARS:', years)
+
+        series = QtCharts.QHorizontalStackedBarSeries()
+        series.setLabelsPrecision(20)
+        series.setLabelsFormat("@value")
+
+        for mestorozdenie_id, mestorozdenie_info in self.data_by_deposits.items():
+            mestorozdenie = self.deposits[mestorozdenie_id]
+            bar_set = QtCharts.QBarSet(mestorozdenie.name)
+            for year in years:
+                value = mestorozdenie_info.get(year, 0)
+                bar_set.append(value) 
+            bar_set.setLabelColor("#000")
+            series.append(bar_set)
+
+        series.setLabelsVisible(True)
+        # series.setLabelsPosition(QtCharts.QAbstractBarSeries.LabelsPosition.LabelsCenter)
+
+        chart = QtCharts.QChart()
+        chart.addSeries(series)
+
+        chart.createDefaultAxes()
+        
+        axis = QtCharts.QBarCategoryAxis()
+        axis.append([str(i) for i in years])
+        series.attachAxis(axis)
+        chart.setAxisY(axis)
+
+        chart.axisX().setLabelFormat("%i")
+        chart.setAnimationOptions(QtCharts.QChart.AnimationOption.SeriesAnimations)
+
+        self.ui.graphicsView3.setChart(chart)
+
+
+    def draw_pie_chart(self):
+        series = QtCharts.QPieSeries()
+
+        for mestorozdenie_id, mestorozdenie_data in self.data_by_deposits.items():
+            mestorozdenie_name = self.deposits[mestorozdenie_id].name
+
+            count = len(mestorozdenie_data)
+            series.append(f"{mestorozdenie_name}", count)
+
+        series.setLabelsVisible()
+
+        chart = QtCharts.QChart()
+        chart.addSeries(series)
+        chart.createDefaultAxes()
+        chart.setAnimationOptions(QtCharts.QChart.AnimationOption.SeriesAnimations)
+
+        self.ui.graphicsView2.setChart(chart)
+
 
     def draw_line_chart(self):
-        # series = QtCharts.QLineSeries()
-        # series.append(0,0)
-        # series.append(2,4)
-        # series.append(3,9)
-        # series.append(4,16)
-        # series.setName("Питон говно")
         self.data_by_deposits = {}
 
         chart = QtCharts.QChart()
@@ -137,48 +192,69 @@ class MainWindow(QMainWindow):
             items = self.data_by_deposits.setdefault(row.mestorozdenie_id, [])
             items.append(row)
 
-        print(self.data_by_deposits)
-
         for mestorozdenie_id, mestorozdenie_data in self.data_by_deposits.items():
 
             mestorozdenie_name = self.deposits[mestorozdenie_id].name
-         
-        # создаем последовательность точек для вывода 
+
+            # создаем последовательность точек для вывода 
             series = QtCharts.QLineSeries()
-        # даем ей название
+            # даем ей название
             series.setName(mestorozdenie_name)
-        # включаем отображение точек
+            # включаем отображение точек
             series.setPointsVisible(True)
-            # series.setMarkerSize(4)
-        
-        # заполняем последовательность точек
-        for row in mestorozdenie_data:
-            # row.year -- это координа X, row.population -- координата Y
-            series.append(1, row.injured_amount)
-        
-        # добавляем последовательность точек на график
+
+            # создаем словарь для подсчета количества происшествий по годам
+            count_by_year = collections.Counter(row.year for row in mestorozdenie_data)
+
+            # добавляем точки на график
+            for year, count in count_by_year.items():
+                series.append(year, count)
+
+            # добавляем последовательность точек на график
             chart.addSeries(series)
-       
-    # активируем отображение осей
+
+        # активируем отображение осей
         chart.createDefaultAxes()
         chart.axisX().setTitleText("Год")
         chart.axisX().setLabelFormat("%i")
         chart.axisX().setMax(chart.axisX().max() + 1)
         chart.axisX().setMin(chart.axisX().min() - 1)
-    
+
         chart.axisY().setLabelFormat("%i")
-        chart.axisY().setTitleText("Сумма затрат, р.")
-        chart.axisY().setMax(chart.axisY().max() + 100000)
-        chart.axisY().setMin(chart.axisY().min() - 100000)
-    
-    # подключаем график к форме
+        chart.axisY().setTitleText("Кол-во происшествий")
+        chart.axisY().setMax(chart.axisY().max() + 10)
+        chart.axisY().setMin(0)
+
+        # подключаем график к форме
         self.ui.graphicsView.setChart(chart)
+
        
         # chart.addSeries(series)
         # chart.createDefaultAxes()
 
         # self.ui.graphicsView.setChart(chart)
    
+
+    def on_btnRemove_click(self):
+        item = self.ui.tblItems.currentIndex()
+        data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+
+        # r = QMessageBox.question(self, "Подтверждение", "Точно ли хотите удалить запись?")
+        # if r == QMessageBox.StandardButton.No:
+        #     return
+
+        with Session(self.engine) as s:
+            query = """
+            DELETE 
+            FROM emergency_occurrence 
+            WHERE id = :id
+            """
+
+            s.execute(text(query), {"id": data.id})
+            s.commit()
+
+        self.load_emergency_occurrence()
+        # self.load_years()
 
     def on_btnAdd_click(self):
         dialog = EditDialog(self.deposits, self.emergencyTypes)
@@ -189,22 +265,21 @@ class MainWindow(QMainWindow):
         data = dialog.get_data()
         with Session(self.engine) as s:
             query = """
-            INSERT INTO emergency_occurrence(mestorozdenie_id, since, until, injured_amount, emergency_type_id, comment)
-            VALUES (:did, :s, :u, :i, :tid, :c)
+            INSERT INTO emergency_occurrence(mestorozdenie_id, year, injured_amount, emergency_type_id, comment)
+            VALUES (:did, :y, :i, :tid, :c)
             """
 
             s.execute(text(query), {
                 "did": data['deposit_id'],
                 "tid": data['type_id'],
-                "s": data['since'],
-                "u": data['until'],
+                "y": data['year'],
                 "i": data['injured'],
                 "c": data['comment'],
             })
             s.commit()
 
-        self.load_emergency_type()
-        self.load_mestorozdenie()
+        # self.load_emergency_type()
+        # self.load_mestorozdenie()
         self.load_emergency_occurrence()
         
 
@@ -231,6 +306,7 @@ class MainWindow(QMainWindow):
             SELECT *
             FROM emergency_occurrence
             WHERE (:mid = 0 OR mestorozdenie_id = :mid) AND (:tid = 0 OR emergency_type_id = :tid)
+            ORDER BY  year DESC
             """
 
             rows = s.execute(text(query), {"mid": deposit_id, "tid": emergencyType_id})
@@ -241,6 +317,8 @@ class MainWindow(QMainWindow):
      
         self.model.setItems(self.rows)
         self.draw_line_chart()
+        self.draw_pie_chart()
+        self.draw_bar_chart()
 
     def load_mestorozdenie(self):
         self.deposits = {}

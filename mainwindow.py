@@ -19,7 +19,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(811, 521)
+        MainWindow.resize(1134, 744)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_2 = QGridLayout(self.centralwidget)
@@ -59,15 +59,30 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addLayout(self.gridLayout, 0, 0, 1, 1)
 
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
         self.graphicsView = QtCharts.QChartView(self.centralwidget)
         self.graphicsView.setObjectName(u"graphicsView")
 
-        self.gridLayout_2.addWidget(self.graphicsView, 0, 1, 1, 1)
+        self.verticalLayout.addWidget(self.graphicsView)
+
+        self.graphicsView2 = QtCharts.QChartView(self.centralwidget)
+        self.graphicsView2.setObjectName(u"graphicsView2")
+
+        self.verticalLayout.addWidget(self.graphicsView2)
+
+
+        self.gridLayout_2.addLayout(self.verticalLayout, 0, 1, 1, 1)
+
+        self.graphicsView3 = QtCharts.QChartView(self.centralwidget)
+        self.graphicsView3.setObjectName(u"graphicsView3")
+
+        self.gridLayout_2.addWidget(self.graphicsView3, 0, 2, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 811, 26))
+        self.menubar.setGeometry(QRect(0, 0, 1134, 26))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")

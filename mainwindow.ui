@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>811</width>
-    <height>521</height>
+    <width>1134</width>
+    <height>744</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,7 +50,17 @@
      </layout>
     </item>
     <item row="0" column="1">
-     <widget class="QtCharts" name="graphicsView"/>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QtCharts" name="graphicsView"/>
+      </item>
+      <item>
+       <widget class="QtCharts" name="graphicsView2"/>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="2">
+     <widget class="QtCharts" name="graphicsView3"/>
     </item>
    </layout>
   </widget>
@@ -59,7 +69,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>811</width>
+     <width>1134</width>
      <height>26</height>
     </rect>
    </property>
