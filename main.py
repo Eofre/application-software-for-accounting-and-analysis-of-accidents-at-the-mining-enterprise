@@ -1,7 +1,7 @@
 import collections
 from statistics import mean
 import sys
-from PySide2.QtWidgets import QApplication, QMainWindow,QDialog
+from PySide2.QtWidgets import QApplication, QMainWindow,QDialog, QMessageBox
 from PySide2 import QtCore, QtWidgets
 from mainwindow import Ui_MainWindow
 from edit_dialog import Ui_Dialog
@@ -95,6 +95,24 @@ class EditDialog(QDialog):
             "comment": self.ui.txtComment.text(),        
         }
 
+class UpdateDialog(EditDialog):
+    def __init__(self, deposits,emergencyTypes, init_data, *args, **kwargs) -> None:
+        super().__init__(deposits,emergencyTypes, *args, **kwargs)
+
+        self.ui.btnAdd.setText('Изменить')
+        self.ui.cmbDeposit.setEnabled(False)
+        print(init_data)
+        mestorozdenie_name = deposits[init_data.mestorozdenie_id].name
+        print(mestorozdenie_name)
+        self.ui.cmbDeposit.setCurrentText(mestorozdenie_name)
+
+        type_name = emergencyTypes[init_data.emergency_type_id].name
+        self.ui.cmbType.setCurrentText(type_name)
+
+        self.ui.txtComment.setText(str(init_data.comment))
+        self.ui.txtYear.setText(str(init_data.year))
+        self.ui.txtInjured.setText(str(init_data.injured_amount))
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -119,6 +137,7 @@ class MainWindow(QMainWindow):
         self.ui.cmbType.currentIndexChanged.connect(self.load_emergency_occurrence)
         self.ui.btnAdd.clicked.connect(self.on_btnAdd_click)
         self.ui.btnRemove.clicked.connect(self.on_btnRemove_click)
+        self.ui.btnEdit.clicked.connect(self.on_btnEdit_click)
     
     def draw_bar_chart(self):
         self.data_by_deposits = {}
@@ -228,20 +247,43 @@ class MainWindow(QMainWindow):
         # подключаем график к форме
         self.ui.graphicsView.setChart(chart)
 
-       
-        # chart.addSeries(series)
-        # chart.createDefaultAxes()
 
-        # self.ui.graphicsView.setChart(chart)
-   
+    def on_btnEdit_click(self):
+        item = self.ui.tblItems.currentIndex()
+        init_data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+
+        dialog = UpdateDialog(self.deposits, self.emergencyTypes, init_data)
+        r = dialog.exec()
+        if r == 0:
+            return
+        
+        data = dialog.get_data()
+
+        with Session(self.engine)  as s:
+            query = """
+            UPDATE emergency_occurrence
+            SET year = :y, injured_amount = :i, emergency_type_id = :tid, comment = :c
+            WHERE id = :id
+            """
+
+            s.execute(text(query), {
+                "tid": data['type_id'],
+                "y": data['year'],
+                "i": data['injured'],
+                "c": data['comment'],
+                "id": init_data.id,
+            })
+            s.commit()
+
+        self.load_emergency_occurrence()
 
     def on_btnRemove_click(self):
         item = self.ui.tblItems.currentIndex()
         data = item.data(QtCore.Qt.ItemDataRole.UserRole)
 
-        # r = QMessageBox.question(self, "Подтверждение", "Точно ли хотите удалить запись?")
-        # if r == QMessageBox.StandardButton.No:
-        #     return
+        r = QMessageBox.question(self, "Подтверждение", "Точно ли вы хотите удалить запись?")
+        if r == QMessageBox.StandardButton.No:
+            return
 
         with Session(self.engine) as s:
             query = """
